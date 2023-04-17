@@ -1,51 +1,62 @@
-
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Spotify Web Playback SDK Quick Start</title>
-</head>
-<body>
-    <h1>Spotify Web Playback SDK Quick Start</h1>
-    <button id="togglePlay">Toggle Play</button>
+  <head>
+    <meta charset="utf-8">
+    <title>My Portfolio</title>
+    <style>
+      .song-info {
+        font-size: 1.2rem;
+        line-height: 1.5;
+        margin: 1rem 0;
+      }
 
+      #song-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      #artist-name {
+        color: #888;
+      }
+
+      #album-title {
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to my portfolio</h1>
+    <div class="song-info">
+      <h2 id="song-title">Loading...</h2>
+      <p id="artist-name">Loading...</p>
+      <p id="album-title">Loading...</p>
+    </div>
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script>
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = '[BQBhPdePzM_YA6SA166DYiC7lWn2qTWK7z-HpJrD4hOyEZkkjX0eTPLitvY1Ity-MfOzqasJMK1fAEqNSFm56KXzGD2vGunskcfEW_ig8Y8INlIQfl82XzObcSl3YjctAHUnqKp6vZbh0vsmHiQxbzUY9csUF9pffeFEKjjPC4eKj_c5lTRpiSujpzuXZvF5Ub032VglVq-TrCnq3o-kDNR2G60]';
-            const player = new Spotify.Player({
-                name: 'Web Playback SDK Quick Start Player',
-                getOAuthToken: cb => { cb(token); },
-                volume: 0.5
-            });
+      window.onSpotifyWebPlaybackSDKReady = () => {
+        const player = new Spotify.Player({
+          name: 'My Portfolio Player',
+          getOAuthToken: cb => {
+            cb('BQBhPdePzM_YA6SA166DYiC7lWn2qTWK7z-HpJrD4hOyEZkkjX0eTPLitvY1Ity-MfOzqasJMK1fAEqNSFm56KXzGD2vGunskcfEW_ig8Y8INlIQfl82XzObcSl3YjctAHUnqKp6vZbh0vsmHiQxbzUY9csUF9pffeFEKjjPC4eKj_c5lTRpiSujpzuXZvF5Ub032VglVq-TrCnq3o-kDNR2G60');
+          },
+        });
 
-            // Ready
-            player.addListener('ready', ({ device_id }) => {
-                console.log('Ready with Device ID', device_id);
-            });
+        player.connect().then(success => {
+          if (success) {
+            console.log('The Web Playback SDK successfully connected to Spotify!');
+          }
+        });
 
-            // Not Ready
-            player.addListener('not_ready', ({ device_id }) => {
-                console.log('Device ID has gone offline', device_id);
-            });
+        player.addListener('player_state_changed', state => {
+          const songTitle = document.getElementById('song-title');
+          const artistName = document.getElementById('artist-name');
+          const albumTitle = document.getElementById('album-title');
 
-            player.addListener('initialization_error', ({ message }) => {
-                console.error(message);
-            });
-
-            player.addListener('authentication_error', ({ message }) => {
-                console.error(message);
-            });
-
-            player.addListener('account_error', ({ message }) => {
-                console.error(message);
-            });
-
-            document.getElementById('togglePlay').onclick = function() {
-              player.togglePlay();
-            };
-
-            player.connect();
-        }
+          songTitle.textContent = state.track_window.current_track.name;
+          artistName.textContent = state.track_window.current_track.artists[0].name;
+          albumTitle.textContent = state.track_window.current_track.album.name;
+        });
+      };
     </script>
-</body>
+  </body>
 </html>
